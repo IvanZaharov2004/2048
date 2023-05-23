@@ -11,11 +11,9 @@ import android.view.View;
 import android.widget.TextView;
 
 public class MainMenuActivity extends AppCompatActivity {
-    protected Intent g;
-
-    protected SharedPreferences sharedPref;
-
-    protected TextView high_score_txt;
+    private Intent g;
+    private SharedPreferences sharedPref;
+    private TextView high_score_txt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +24,7 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n")
+    @Override
     protected void onResume() {
         super.onResume();
         int high_score = sharedPref.getInt(Keys.HIGH_SCORE_KEY, 0);

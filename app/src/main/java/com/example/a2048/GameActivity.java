@@ -3,7 +3,10 @@ package com.example.a2048;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,53 +15,55 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class GameActivity extends AppCompatActivity {
-    protected SharedPreferences sharedPref;
-    protected ImageView iv1_1;
-    protected ImageView iv1_2;
-    protected ImageView iv1_3;
-    protected ImageView iv1_4;
-    protected ImageView iv2_1;
-    protected ImageView iv2_2;
-    protected ImageView iv2_3;
-    protected ImageView iv2_4;
-    protected ImageView iv3_1;
-    protected ImageView iv3_2;
-    protected ImageView iv3_3;
-    protected ImageView iv3_4;
-    protected ImageView iv4_1;
-    protected ImageView iv4_2;
-    protected ImageView iv4_3;
-    protected ImageView iv4_4;
-    protected ImageView img_no_btn;
-    protected int score;
-    protected TextView tv_score;
-    protected Board TileMap;
-    public Bitmap temp;
-    public Bitmap n0;
-    public Bitmap n2;
-    public Bitmap n4;
-    public Bitmap n8;
-    public Bitmap n16;
-    public Bitmap n32;
-    public Bitmap n64;
-    public Bitmap n128;
-    public Bitmap n256;
-    public Bitmap n512;
-    public Bitmap n1024;
-    public Bitmap n2048;
-    public String score_text;
 
-    public final float sensitivity = 100;
+    private SharedPreferences sharedPref;
+    private ImageView iv1_1;
+    private ImageView iv1_2;
+    private ImageView iv1_3;
+    private ImageView iv1_4;
+    private ImageView iv2_1;
+    private ImageView iv2_2;
+    private ImageView iv2_3;
+    private ImageView iv2_4;
+    private ImageView iv3_1;
+    private ImageView iv3_2;
+    private ImageView iv3_3;
+    private ImageView iv3_4;
+    private ImageView iv4_1;
+    private ImageView iv4_2;
+    private ImageView iv4_3;
+    private ImageView iv4_4;
+    private int score;
+    private TextView tv_score;
+    private Board TileMap;
+    private Bitmap temp;
+    private Bitmap n0;
+    private Bitmap n2;
+    private Bitmap n4;
+    private Bitmap n8;
+    private Bitmap n16;
+    private Bitmap n32;
+    private Bitmap n64;
+    private Bitmap n128;
+    private Bitmap n256;
+    private Bitmap n512;
+    private Bitmap n1024;
+    private Bitmap n2048;
+    private boolean is_2048 = false;
+    private String score_text;
 
     protected GestureDetector.SimpleOnGestureListener simpleOnGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
                                float velocityY) {
+            float sensitivity = 100;
             if ((e1.getX() - e2.getX()) > sensitivity) {
                 left();
             } else if ((e2.getX() - e1.getX()) > sensitivity) {
@@ -85,8 +90,15 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.main_game);
         sharedPref = getSharedPreferences(Keys.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
         boolean is_continue = getIntent().getBooleanExtra(Keys.SAVE_KEY, false);
-        if (is_continue)
+        if (is_continue) {
             TileMap = new Board(sharedPref.getString(Keys.SAVE_KEY, Keys.DEFLATE_BOARD_STATE));
+            for (int i = 0; i < 4; i++) {
+                if (TileMap.map.get(i).contains(2048)) {
+                    is_2048 = true;
+                    break;
+                }
+            }
+        }
         else
             TileMap = new Board();
         iv1_1 = findViewById(R.id.cell_1_1);
@@ -106,9 +118,7 @@ public class GameActivity extends AppCompatActivity {
         iv4_3 = findViewById(R.id.cell_4_3);
         iv4_4 = findViewById(R.id.cell_4_4);
 
-        img_no_btn = findViewById(R.id.img_no_btn);
         tv_score = findViewById(R.id.score);
-
 
         score_text = getResources().getString(R.string.score);
         load_textures();
@@ -184,9 +194,9 @@ public class GameActivity extends AppCompatActivity {
         iv4_3.setImageBitmap(get_texture(TileMap.map.get(3).get(2)));
         iv4_4.setImageBitmap(get_texture(TileMap.map.get(3).get(3)));
         score = 0;
-        for (ArrayList<Integer> i : TileMap.map) {
-            for (int j : i) {
-                score += j   ;
+        for (ArrayList<Integer> list : TileMap.map) {
+            for (int j : list) {
+                score += j;
             }
         }
         tv_score.setText(score_text + ": " + score);
@@ -198,6 +208,7 @@ public class GameActivity extends AppCompatActivity {
         TileMap.merge();
         TileMap.cover_up();
         TileMap.transpose();
+        check_win();
         TileMap.add_tile();
         update();
     }
@@ -210,6 +221,7 @@ public class GameActivity extends AppCompatActivity {
         TileMap.cover_up();
         TileMap.reverse();
         TileMap.transpose();
+        check_win();
         TileMap.add_tile();
         update();
     }
@@ -218,6 +230,7 @@ public class GameActivity extends AppCompatActivity {
         TileMap.cover_up();
         TileMap.merge();
         TileMap.cover_up();
+        check_win();
         TileMap.add_tile();
         update();
     }
@@ -228,10 +241,22 @@ public class GameActivity extends AppCompatActivity {
         TileMap.merge();
         TileMap.cover_up();
         TileMap.reverse();
+        check_win();
         TileMap.add_tile();
         update();
     }
 
+    // проверка ,что игрок набрал 2048
+    public void check_win() {
+        if (!is_2048) {
+            for (int i = 0; i < 4; i++) {
+                if (TileMap.map.get(i).contains(2048)) {
+                    is_2048 = true;
+                    createOn2048Dialog(this);
+                }
+            }
+        }
+    }
 
     @Override
     protected void onStop() {
@@ -254,5 +279,14 @@ public class GameActivity extends AppCompatActivity {
             editor.putInt(Keys.HIGH_SCORE_KEY, score) ;
             editor.apply();
         }
+    }
+
+    public void createOn2048Dialog(Activity activity) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle("2048!").setMessage("You've got 2048. You can continue or finish the game")
+                .setPositiveButton("Continue", (dialog, id) -> Toast.makeText(activity, "Continue", Toast.LENGTH_SHORT).show())
+                .setNegativeButton("Finish", (dialog, id) -> startActivity(new Intent(this, MainMenuActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)));
+        builder.create().show();
     }
 }

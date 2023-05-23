@@ -9,8 +9,8 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Board {
-    public ArrayList<ArrayList<Integer>> map;
-    public Random random = new Random();
+    protected ArrayList<ArrayList<Integer>> map;
+    protected Random random = new Random();
 
     public Board() {
         map = new ArrayList<>();
@@ -19,7 +19,7 @@ public class Board {
         }
     }
 
-    public Board(String save){
+    public Board(String save) {
         Scanner in = new Scanner(save);
         ArrayList<ArrayList<Integer>> temp = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
@@ -31,6 +31,7 @@ public class Board {
         map = temp;
     }
 
+    // добавляем новую плитку
     public void add_tile() {
         boolean is_full = true;
         for (int i = 0; i < 4; i++) {
@@ -55,12 +56,14 @@ public class Board {
         }
     }
 
+    // обратный порядок чисел
     public void reverse() {
         for (int i = 0; i < 4; i++) {
             Collections.reverse(map.get(i));
         }
     }
 
+    // транспонирование
     public void transpose() {
         ArrayList<ArrayList<Integer>> temp = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
@@ -72,6 +75,7 @@ public class Board {
         map = temp;
     }
 
+    // "спускаем" нули
     public void cover_up() {
         ArrayList<ArrayList<Integer>> temp = new ArrayList<>();
         int count;
@@ -104,6 +108,7 @@ public class Board {
             }
         }
     }
+
 
     @NonNull
     @Override
