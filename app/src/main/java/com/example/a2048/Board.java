@@ -96,6 +96,7 @@ public class Board {
         map = temp;
     }
 
+    // сложение плиток
     public void merge() {
         int item;
         for (int i = 0; i < 4; i++) {
