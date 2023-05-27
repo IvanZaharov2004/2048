@@ -18,10 +18,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class GameActivity extends AppCompatActivity {
 
+    private static final int INITIAL_SCORE_VALUE = 0;
     private SharedPreferences sharedPref;
     private ImageView iv1_1;
     private ImageView iv1_2;
@@ -120,7 +120,7 @@ public class GameActivity extends AppCompatActivity {
         score_text = getResources().getString(R.string.score);
 
         load_textures();
-        update();
+        update(INITIAL_SCORE_VALUE);
     }
 
     public void load_textures() {
@@ -171,7 +171,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n")
-    public void update() {
+    public void update(int score) {
         iv1_1.setImageBitmap(get_texture(TileMap.map.get(0).get(0)));
         iv1_2.setImageBitmap(get_texture(TileMap.map.get(0).get(1)));
         iv1_3.setImageBitmap(get_texture(TileMap.map.get(0).get(2)));
@@ -188,57 +188,52 @@ public class GameActivity extends AppCompatActivity {
         iv4_2.setImageBitmap(get_texture(TileMap.map.get(3).get(1)));
         iv4_3.setImageBitmap(get_texture(TileMap.map.get(3).get(2)));
         iv4_4.setImageBitmap(get_texture(TileMap.map.get(3).get(3)));
-        score = 0;
-        for (ArrayList<Integer> list : TileMap.map) {
-            for (int j : list) {
-                score += j;
-            }
-        }
         tv_score.setText(score_text + ": " + score);
+        this.score = score;
     }
 
     public void up() {
         TileMap.transpose();
         TileMap.cover_up();
-        TileMap.merge();
+        int newScore = TileMap.merge(this.score);
         TileMap.cover_up();
         TileMap.transpose();
         check_win();
         TileMap.add_tile();
-        update();
+        update(newScore);
     }
 
     public void down() {
         TileMap.transpose();
         TileMap.reverse();
         TileMap.cover_up();
-        TileMap.merge();
+        int newScore = TileMap.merge(this.score);
         TileMap.cover_up();
         TileMap.reverse();
         TileMap.transpose();
         check_win();
         TileMap.add_tile();
-        update();
+        update(newScore);
     }
 
     public void left() {
         TileMap.cover_up();
-        TileMap.merge();
+        int newScore = TileMap.merge(this.score);
         TileMap.cover_up();
         check_win();
         TileMap.add_tile();
-        update();
+        update(newScore);
     }
 
     public void right() {
         TileMap.reverse();
         TileMap.cover_up();
-        TileMap.merge();
+        int newScore = TileMap.merge(this.score);
         TileMap.cover_up();
         TileMap.reverse();
         check_win();
         TileMap.add_tile();
-        update();
+        update(newScore);
     }
 
     public void check_win() {
@@ -328,7 +323,7 @@ public class GameActivity extends AppCompatActivity {
                     save_high_score();
                     TileMap = new Board();
                     is_2048 = false;
-                    update();
+                    update(INITIAL_SCORE_VALUE);
                 });
         builder.create().show();
     }

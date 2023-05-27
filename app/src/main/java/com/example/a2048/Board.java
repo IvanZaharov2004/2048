@@ -97,7 +97,7 @@ public class Board {
     }
 
     // сложение плиток
-    public void merge() {
+    public int merge(int score) {
         int item;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 3; j++) {
@@ -105,9 +105,11 @@ public class Board {
                 if (map.get(i).get(j + 1) == item & item != 0) {
                     map.get(i).set(j, item * 2);
                     map.get(i).set(j + 1, 0);
+                    score += item * 2;
                 }
             }
         }
+        return score;
     }
 
 
