@@ -55,6 +55,7 @@ public class GameActivity extends AppCompatActivity {
     private boolean is_2048 = false;
     private String score_text;
     private final int INITIAL_SCORE_VALUE = 0;
+
     protected GestureDetector.SimpleOnGestureListener simpleOnGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
         @Override
@@ -308,8 +309,7 @@ public class GameActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("2048!").setMessage("You've got 2048. You can continue or finish the game")
                 .setPositiveButton("Continue", (dialog, id) -> Toast.makeText(activity, "Continue", Toast.LENGTH_SHORT).show())
-                .setNegativeButton("Finish", (dialog, id) -> startActivity(new Intent(this, MainMenuActivity.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)));
+                .setNegativeButton("Finish", (dialog, id) -> startActivity(new Intent(this, MainMenuActivity.class)));
         builder.create().show();
     }
 
@@ -325,5 +325,4 @@ public class GameActivity extends AppCompatActivity {
                 });
         builder.create().show();
     }
-
 }

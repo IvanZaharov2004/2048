@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 
 public class MainMenuActivity extends AppCompatActivity {
-    private Intent g;
+    private Intent game;
     private SharedPreferences sharedPref;
     private TextView high_score_txt;
 
@@ -32,14 +32,13 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     public void btn_new_game_click(View view) {
-        g = new Intent(this, GameActivity.class);
-        startActivity(g);
+        game = new Intent(this, GameActivity.class);
+        startActivity(game);
     }
 
     public void btn_continue_click(View view) {
-        g = new Intent(this, GameActivity.class);
-        g.putExtra(Keys.SAVE_KEY, true);
-        startActivity(g);
+        game = new Intent(this, GameActivity.class);
+        game.putExtra(Keys.SAVE_KEY, true);
+        startActivity(game);
     }
-
 }
